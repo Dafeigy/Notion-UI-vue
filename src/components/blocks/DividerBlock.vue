@@ -1,0 +1,3 @@
+<template>
+    Divider
+</template>

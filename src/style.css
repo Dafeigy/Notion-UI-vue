@@ -1,0 +1,40 @@
+@import "tailwindcss";
+/* https://github.com/Dashibase/lotion/blob/main/src/index.css */
+* {
+  border-width: 0;
+  box-sizing: border-box;
+}
+
+.notion [contenteditable='true']:focus-visible,
+.notion [contenteditable='true']:focus {
+  outline: none;
+}
+
+.notion [contenteditable]:empty:after {
+  content: attr(data-ph);
+  color: rgba(0, 0, 0, 0.2);
+  cursor: text;
+}
+
+.notion p,
+pre.notion-md {
+  margin: 0;
+}
+
+pre.notion-md {
+  font-family: theme('fontFamily.mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace);
+  font-size: 1em;
+}
+
+.notion-ghost {
+  opacity: 1;
+  background: #F5F5F5;
+}
+
+.notion .ProseMirror:focus p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #adb5bd;
+  pointer-events: none;
+  height: 0;
+}
