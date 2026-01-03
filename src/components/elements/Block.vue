@@ -4,7 +4,28 @@
     :class="['notion-block', props.class]"
     @mouseup="handleMouseUp"
     @mousedown="handleMouseDown"
+    @mouseenter="handleMouseEnter"
+    @mouseleave="handleMouseLeave"
+    @focus="handleFocus"
+    @blur="handleBlur"
+    tabindex="0"
+    class="flex"
   >
+    <div class="mr-0.5 flex items-center">
+        <Plus 
+          :class="[
+            'hover:bg-muted cursor-pointer m-0.5 rounded transition-opacity',
+            (isHovered || isActive) ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          ]" 
+        />
+        <GripVertical 
+          :class="[
+            'hover:bg-muted cursor-pointer m-0.5 rounded transition-opacity',
+            (isHovered || isActive) ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          ]" 
+        />
+    </div>
+    
     <slot />
     
     <Teleport to="body" v-if="showHoverBar && selectionPosition">
@@ -26,7 +47,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import HoverBar from '@/components/elements/HoverBar.vue'
-
+import { Plus,GripVertical } from 'lucide-vue-next'
 interface Position {
   x: number
   y: number
@@ -44,6 +65,8 @@ const showHoverBar = ref(false)
 const selectionPosition = ref<Position | null>(null)
 const isSelecting = ref(false)
 const startSelectionTime = ref(0)
+const isHovered = ref(false)
+const isActive = ref(false)
 
 /**
  * 获取选中文字所在元素的行高（像素单位）
@@ -122,35 +145,55 @@ const parseLineHeight=(lineHeight: string, fontSize: number): number =>{
   return fontSize * 1.2
 }
 
-/**
- * 获取选中文字所在元素的字体大小
- * @param range 选中的Range对象
- * @returns 字体大小的像素值
- */
-const getSelectionFontSize=(range: Range): number =>{
-  let element: HTMLElement | null = null
+// /**
+//  * 获取选中文字所在元素的字体大小
+//  * @param range 选中的Range对象
+//  * @returns 字体大小的像素值
+//  */
+// const getSelectionFontSize=(range: Range): number =>{
+//   let element: HTMLElement | null = null
   
-  if (range.startContainer.nodeType === Node.TEXT_NODE) {
-    element = range.startContainer.parentElement
-  } else {
-    element = range.startContainer as HTMLElement
-  }
+//   if (range.startContainer.nodeType === Node.TEXT_NODE) {
+//     element = range.startContainer.parentElement
+//   } else {
+//     element = range.startContainer as HTMLElement
+//   }
   
-  if (!element) {
-    const container = range.commonAncestorContainer
-    if (container.nodeType === Node.TEXT_NODE) {
-      element = container.parentElement
-    } else {
-      element = container as HTMLElement
-    }
-  }
+//   if (!element) {
+//     const container = range.commonAncestorContainer
+//     if (container.nodeType === Node.TEXT_NODE) {
+//       element = container.parentElement
+//     } else {
+//       element = container as HTMLElement
+//     }
+//   }
   
-  if (!element) {
-    return 16 // 默认16px
-  }
+//   if (!element) {
+//     return 16 // 默认16px
+//   }
   
-  const computedStyle = window.getComputedStyle(element)
-  return parseFloat(computedStyle.fontSize) || 16
+//   const computedStyle = window.getComputedStyle(element)
+//   return parseFloat(computedStyle.fontSize) || 16
+// }
+
+// 处理鼠标进入事件
+const handleMouseEnter = () => {
+  isHovered.value = true
+}
+
+// 处理鼠标离开事件
+const handleMouseLeave = () => {
+  isHovered.value = false
+}
+
+// 处理焦点获得事件
+const handleFocus = () => {
+  isActive.value = true
+}
+
+// 处理焦点失去事件
+const handleBlur = () => {
+  isActive.value = false
 }
 
 // 处理鼠标按下事件
