@@ -12,18 +12,39 @@
     class="flex"
   >
     <div class="mr-0.5 flex items-center">
-        <Plus 
-          :class="[
-            'hover:bg-muted cursor-pointer m-0.5 rounded transition-opacity',
-            (isHovered || isActive) ? 'opacity-100' : 'opacity-0 pointer-events-none'
-          ]" 
-        />
-        <GripVertical 
-          :class="[
-            'hover:bg-muted cursor-pointer m-0.5 rounded transition-opacity',
-            (isHovered || isActive) ? 'opacity-100' : 'opacity-0 pointer-events-none'
-          ]" 
-        />
+      <TooltipProvider>
+          <Tooltip>
+          <TooltipTrigger class="rounded-none cursor-pointer">
+            <Plus class="w-4 h-4"
+              :class="[
+                'hover:bg-muted cursor-pointer m-0.5 rounded transition-opacity',
+                (isHovered || isActive)&&!isBaseBlock() ? 'opacity-100' : 'opacity-0 pointer-events-none'
+              ]" 
+            />
+          </TooltipTrigger>
+          <TooltipContent>
+              <p><b>Click</b> to add new <code>Block</code></p>
+          </TooltipContent>
+          </Tooltip>
+      </TooltipProvider>
+
+      <TooltipProvider>
+          <Tooltip>
+          <TooltipTrigger class="rounded-none cursor-pointer">
+            <GripVertical class="w-4 h-4"
+              :class="[
+                'hover:bg-muted cursor-pointer m-0.5 rounded transition-opacity',
+                (isHovered || isActive)&&!isBaseBlock() ? 'opacity-100' : 'opacity-0 pointer-events-none'
+              ]" 
+            />
+          </TooltipTrigger>
+          <TooltipContent>
+              <p><b>Drag</b> to move this <code>Block</code></p>
+          </TooltipContent>
+          </Tooltip>
+      </TooltipProvider>
+        
+        
     </div>
     
     <slot />
@@ -45,6 +66,12 @@
 </template>
 
 <script setup lang="ts">
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import HoverBar from '@/components/elements/HoverBar.vue'
 import { Plus,GripVertical } from 'lucide-vue-next'
@@ -68,6 +95,9 @@ const startSelectionTime = ref(0)
 const isHovered = ref(false)
 const isActive = ref(false)
 
+const isBaseBlock = (): boolean =>{
+  return props.class?.includes('notion-block') || false
+}
 /**
  * 获取选中文字所在元素的行高（像素单位）
  * @param range 选中的Range对象
