@@ -8,7 +8,7 @@ import Block from '@/components/elements/Block.vue'
     <h1 class="text-3xl font-bold flex items-center">
         Light/Dark Mode Toggle<SwitchMode class="m-4"/>
       </h1>
-    <div class="block-editor bg-accent p-4 rounded-xl">
+    <div class="block-editor bg-accent/20 p-4 rounded-xl">
       <Block class="flex flex-col notion-block">
           <Block class="my-1 p-1 border rounded">
           <h1 class="text-3xl font-bold flex items-center block-editor">H1: 另一个标题块</h1>

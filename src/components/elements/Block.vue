@@ -15,7 +15,7 @@
       <TooltipProvider>
           <Tooltip>
           <TooltipTrigger class="rounded-none cursor-pointer">
-            <Plus class="w-4 h-4"
+            <Plus class=" p-0.5"
               :class="[
                 'hover:bg-muted cursor-pointer m-0.5 rounded transition-opacity',
                 (isHovered || isActive)&&!isBaseBlock() ? 'opacity-100' : 'opacity-0 pointer-events-none'
@@ -31,7 +31,7 @@
       <TooltipProvider>
           <Tooltip>
           <TooltipTrigger class="rounded-none cursor-pointer">
-            <GripVertical class="w-4 h-4"
+            <GripVertical class=" p-0.5"
               :class="[
                 'hover:bg-muted cursor-pointer m-0.5 rounded transition-opacity',
                 (isHovered || isActive)&&!isBaseBlock() ? 'opacity-100' : 'opacity-0 pointer-events-none'
@@ -43,8 +43,6 @@
           </TooltipContent>
           </Tooltip>
       </TooltipProvider>
-        
-        
     </div>
     
     <slot />
