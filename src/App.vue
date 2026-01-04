@@ -48,7 +48,7 @@ const onListChange = (event: any) => {
       v-bind="dragOptions"
     >
       <transition-group type="transition">
-        <Block v-for="block in blocks" :key="block.id" class="my-1 p-1 border rounded" :id="'block-'+block.id">
+        <Block v-for="block in blocks" :key="block.id" class="my-1 p-1 border rounded first:my-0" :id="'block-'+block.id">
           <component :is="block.tag" v-html="block.content" :class="block.class" />
         </Block>
       </transition-group>
