@@ -31,7 +31,7 @@
       <TooltipProvider>
           <Tooltip>
           <TooltipTrigger class="rounded-none cursor-pointer">
-            <GripVertical class=" p-0.5"
+            <GripVertical class="handle p-0.5"
               :class="[
                 'hover:bg-muted cursor-pointer m-0.5 rounded transition-opacity',
                 (isHovered || isActive)&&!isBaseBlock() ? 'opacity-100' : 'opacity-0 pointer-events-none'
@@ -73,6 +73,8 @@ import {
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import HoverBar from '@/components/elements/HoverBar.vue'
 import { Plus,GripVertical } from 'lucide-vue-next'
+
+
 interface Position {
   x: number
   y: number
