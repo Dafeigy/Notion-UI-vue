@@ -2,6 +2,7 @@
   <div 
     ref="blockRef"
     :class="['notion-block', props.class]"
+    :content="props.content"
     @mouseup="handleMouseUp"
     @mousedown="handleMouseDown"
     @mouseenter="handleMouseEnter"
@@ -17,11 +18,28 @@
       <TooltipProvider>
           <Tooltip>
           <TooltipTrigger class="rounded-none cursor-pointer">
+            <Save class=" p-0.5"
+              :class="[
+                'hover:bg-muted cursor-pointer m-0.5 rounded transition-opacity',
+                (isHovered || isActive)&&!isBaseBlock() ? 'opacity-100' : 'opacity-0 pointer-events-none'
+              ]" 
+              @click="handleToggleContentEditable"
+            />
+          </TooltipTrigger>
+          <TooltipContent>
+              <p><b>TODO</b></p>
+          </TooltipContent>
+          </Tooltip>
+      </TooltipProvider>
+      <TooltipProvider>
+          <Tooltip>
+          <TooltipTrigger class="rounded-none cursor-pointer">
             <Plus class=" p-0.5"
               :class="[
                 'hover:bg-muted cursor-pointer m-0.5 rounded transition-opacity',
                 (isHovered || isActive)&&!isBaseBlock() ? 'opacity-100' : 'opacity-0 pointer-events-none'
               ]" 
+              @click="handleAddBlock"
             />
           </TooltipTrigger>
           <TooltipContent>
@@ -47,8 +65,13 @@
       </TooltipProvider>
     </div>
     
-    <slot />
-    
+    <slot 
+      ref="contentRef"
+      @input="handleInput"
+    >
+    {{ props.content }}
+  </slot>
+
     <Teleport to="body" v-if="showHoverBar && selectionPosition">
       <div
         ref="hoverBarRef"
@@ -72,21 +95,72 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick, inject } from 'vue'
 import HoverBar from '@/components/elements/HoverBar.vue'
-import { Plus,GripVertical } from 'lucide-vue-next'
+import { Plus,GripVertical,Save } from 'lucide-vue-next'
+import { BlockType } from '@/newutils/types'
+// import type { BlockData } from '@/newutils/types'
+const emit = defineEmits(['update:modelValue', 'update:content'])
 
+const contentRef = ref<HTMLElement | null>(null)
+
+// 处理输入事件
+const handleInput = (event: any) => {
+  const newContent = event.target.textContent || event.target.innerText
+  // 使用 v-model 方式
+  // emit('update:modelValue', newContent)
+  // 或者直接更新 content
+  emit('update:content', newContent)
+}
+
+// 确保内容同步
+// onMounted(() => {
+//   if (contentRef.value) {
+//     (contentRef.value as HTMLElement).textContent = props.content || ''
+//   }
+// })
+
+// Inject blocks 和操作方法
+// const blocks = inject<Ref<BlockData[]>>('blocks')
+const addBlock = inject<(index: number, type?: BlockType) => void>('addBlock')
+const deleteBlock = inject<(id: string) => void>('deleteBlock')
+
+interface Props {
+  id?: string
+  content?: string
+  type?: BlockType
+  class?: string
+  index?:number
+}
+const props = defineProps<Props>()
+
+const handleToggleContentEditable = ()=>{
+  if (blockRef.value) {
+    if (blockRef.value.contentEditable == 'false') {
+      blockRef.value.contentEditable = 'true'
+    } else {
+      blockRef.value.contentEditable = 'false'
+    }
+  }
+}
+
+const handleAddBlock = () => {
+  if (addBlock && props.index !== undefined) {
+    addBlock(props.index)
+  }
+}
+
+const handleDeleteBlock = () => {
+  const blockId = props.id?.replace('block-', '')
+  if (deleteBlock && blockId) {
+    deleteBlock(blockId)
+  }
+}
 
 interface Position {
   x: number
   y: number
 }
-
-interface Props {
-  class?: string
-}
-
-const props = defineProps<Props>()
 
 const blockRef = ref<HTMLElement | null>(null)
 const hoverBarRef = ref<HTMLElement | null>(null)

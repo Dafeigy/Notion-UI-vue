@@ -11,3 +11,7 @@ Next will be dynamic `markdown` render, Block management, data structure design 
 
 
 Some of the code is from [Lotion](https://lotion.dashibase.com/), and I will try to follow their design as closely as possible.
+
+## structure
+
+Block should be re-written. Add/Delete logic should be written in ts.

@@ -1,30 +1,43 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, provide,reactive } from 'vue'
 import SwitchMode from '@/components/SwitchMode.vue'
 import Block from '@/components/elements/Block.vue'
 import { VueDraggableNext as draggable } from 'vue-draggable-next'
-import type { Directive } from 'vue'
-interface BlockItem {
-  id: string
-  content: string
-  tag: string
-  class?: string
+import { BlockType, type BlockData } from '@/newutils/types'
+import { createBlock } from '@/newutils/utils'
+
+// 使用 BlockData 类型
+const blocks = ref<BlockData[]>([
+  createBlock(BlockType.Text, '👋 Welcome! This is a private page for you to play around with.'),
+  createBlock(BlockType.Text, 'Give these things a try:'),
+  createBlock(BlockType.Text, '1. Hover on the left of each line for quick actions'),
+  createBlock(BlockType.Text, '2. Click on the + button to add a new line(TODO)'),
+  createBlock(BlockType.Text, '3. Drag the ⋮⋮ button to reorder'),
+  createBlock(BlockType.Text, '4. Click the trash icon to delete this block'),
+  createBlock(BlockType.Text, '5. Bold and italicize using markdown e.g. **bold** and *italics*'),
+  createBlock(BlockType.Text, "6. Add headers and dividers with '#', '##' or '---' followed by a space"),
+])
+
+// Provide blocks 和操作方法给子组件
+provide('blocks', blocks)
+
+// 添加 Block 的方法
+const addBlock = (index: number, type: BlockType = BlockType.Text) => {
+  const newBlock = createBlock(type)
+  blocks.value.splice(index + 1, 0, newBlock)
 }
 
-const blocks = ref<BlockItem[]>(
-[
-  { id: '1', content: '👋 Welcome! This is a private page for you to play around with.', tag: 'p', class: 'border rounded my-1' },
-  { id: '2', content: 'Give these things a try:', tag: 'p', class: 'border rounded my-1' },
-  { id: '3', content: '1. Hover on the left of each line for quick actions', tag: 'p', class: 'border rounded my-1' },
-  { id: '4', content: '2. Click on the + button to add a new line(TODO)', tag: 'p', class: 'border rounded my-1' },
-  { id: '5', content: '3. Drag the ⋮⋮ button to reorder', tag: 'p', class: 'border rounded my-1' },
-  { id: '6', content: '4. Click the trash icon to delete this block', tag: 'p', class: 'border rounded my-1' },
-  { id: '7', content: '5. Bold and italicize using markdown e.g. **bold** and *italics*', tag: 'p', class: 'border rounded my-1' },
-  { id: '8', content: "6. Add headers and dividers with '#', '##' or '---' followed by a space", tag: 'p', class: 'border rounded my-1' },
-  // { id: '3', content: 'H3: 另一个标题块', tag: 'h3', class: 'my-0.5 text-1xl font-bold flex items-center block-editor' },
-  // { id: '4', content: '这是一个<code class="mx-1 p-1 rounded bg-secondary ">Block</code>，当你选中这里的文字时，悬浮框会显示在选中文字的顶部。', tag: 'p', class: ' border rounded' },
-  // { id: '5', content: 'This is a <code class="mx-1 p-1 rounded bg-secondary ">Block</code>, When you select text here, HoverBar will show upon the selected text.', tag: 'p', class: ' border rounded' },
-])
+provide('addBlock', addBlock)
+
+// 删除 Block 的方法
+const deleteBlock = (id: string) => {
+  const index = blocks.value.findIndex(b => b.id === id)
+  if (index !== -1) {
+    blocks.value.splice(index, 1)
+  }
+}
+
+provide('deleteBlock', deleteBlock)
 
 const dragOptions = {
   animation: 150,
@@ -36,40 +49,11 @@ const dragOptions = {
 const onListChange = (event: any) => {
   console.log('List changed:', event)
 }
-
-const vEditable: Directive = {
-  mounted(el, binding) {
-    const { id, onUpdate } = binding.value
-    
-    el.addEventListener('input', (event: Event) => {
-      onUpdate(id, (event.target as HTMLElement).innerHTML)
-    })
-    
-    el.addEventListener('blur', (event: Event) => {
-      onUpdate(id, (event.target as HTMLElement).innerHTML)
-    })
-    
-    // 保存引用以便清理
-    el._editableHandler = (event: Event) => {
-      onUpdate(id, (event.target as HTMLElement).innerHTML)
-    }
-  },
-  beforeUnmount(el) {
-    // 清理事件监听器
-    if (el._editableHandler) {
-      el.removeEventListener('input', el._editableHandler)
-      el.removeEventListener('blur', el._editableHandler)
-    }
+const updateBlockContent = (index: number, newContent: string) => {
+  if (blocks.value[index]) {
+    blocks.value[index].content = newContent
   }
 }
-
-const updateBlockContent = (id: string, content: string) => {
-  const blockIndex = blocks.value.findIndex(block => block.id === id)
-  if (blockIndex !== -1) {
-    blocks.value[blockIndex].content = content
-  }
-}
-
 </script>
 
 <template>
@@ -96,24 +80,23 @@ const updateBlockContent = (id: string, content: string) => {
             v-bind="dragOptions"
           >
             <transition-group type="transition">
-              <Block v-for="block in blocks" 
+              <Block v-for="(block, index) in blocks" 
               :key="block.id" 
+              :content="block.content"
+              @input="updateBlockContent(index, $event)"
               class="my-1 p-1 border rounded first:my-0 max-w-full" 
               :id="'block-'+block.id"
+              :index="index"
               >
-                <component 
-                  :is="block.tag" 
-                  :class="block.class" 
-                  contenteditable="true"
-                  v-model="block.content"
-                >
-                {{ block.content }}
-              </component>
+
+                <!-- {{ block.content }} -->
+
               </Block>
             </transition-group>
           </draggable>
         </Block>
-      </div>
+        
+        </div>
       </div>
     </div>
     
