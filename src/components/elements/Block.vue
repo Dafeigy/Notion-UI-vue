@@ -65,12 +65,7 @@
       </TooltipProvider>
     </div>
     
-    <slot 
-      ref="contentRef"
-      @input="handleInput"
-    >
-    {{ props.content }}
-  </slot>
+    <slot />
 
     <Teleport to="body" v-if="showHoverBar && selectionPosition">
       <div

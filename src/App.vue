@@ -89,7 +89,7 @@ const updateBlockContent = (index: number, newContent: string) => {
               :index="index"
               >
 
-                <!-- {{ block.content }} -->
+                {{ block.content }}
 
               </Block>
             </transition-group>
