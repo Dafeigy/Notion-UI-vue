@@ -8,6 +8,8 @@
     @mouseleave="handleMouseLeave"
     @focus="handleFocus"
     @blur="handleBlur"
+    @keydown="handleKeyDown"
+    @keyup="parseMarkdown"
     tabindex="0"
     class="flex"
   >
@@ -95,6 +97,11 @@ const startSelectionTime = ref(0)
 const isHovered = ref(false)
 const isActive = ref(false)
 
+const parseMarkdown = (event: KeyboardEvent) =>{
+  
+  console.log(event.key,"start Markdown Parse...")
+}
+
 const isBaseBlock = (): boolean =>{
   return props.class?.includes('notion-block') || false
 }
@@ -174,37 +181,6 @@ const parseLineHeight=(lineHeight: string, fontSize: number): number =>{
   // 默认使用1.2倍字体大小
   return fontSize * 1.2
 }
-
-// /**
-//  * 获取选中文字所在元素的字体大小
-//  * @param range 选中的Range对象
-//  * @returns 字体大小的像素值
-//  */
-// const getSelectionFontSize=(range: Range): number =>{
-//   let element: HTMLElement | null = null
-  
-//   if (range.startContainer.nodeType === Node.TEXT_NODE) {
-//     element = range.startContainer.parentElement
-//   } else {
-//     element = range.startContainer as HTMLElement
-//   }
-  
-//   if (!element) {
-//     const container = range.commonAncestorContainer
-//     if (container.nodeType === Node.TEXT_NODE) {
-//       element = container.parentElement
-//     } else {
-//       element = container as HTMLElement
-//     }
-//   }
-  
-//   if (!element) {
-//     return 16 // 默认16px
-//   }
-  
-//   const computedStyle = window.getComputedStyle(element)
-//   return parseFloat(computedStyle.fontSize) || 16
-// }
 
 // 处理鼠标进入事件
 const handleMouseEnter = () => {
@@ -298,10 +274,12 @@ const handleSelectionChange = () => {
 
 // 监听键盘事件（如按ESC关闭）
 const handleKeyDown = (event: KeyboardEvent) => {
+  // console.log(event.key,"start Renderer...")
   if (event.key === 'Escape') {
     showHoverBar.value = false
     selectionPosition.value = null
   }
+  
 }
 
 onMounted(() => {
